@@ -170,6 +170,7 @@ class Woo_Pickup
 		$this->loader->add_action('woocommerce_admin_order_data_after_shipping_address', $plugin_admin, 'order_admin_page_modifications');
 		$this->loader->add_action('woocommerce_email_order_details', $plugin_admin, 'add_store_details_to_confirmation_mail', 10, 4);
 		$this->loader->add_action('woocommerce_email_order_details', $plugin_admin, 'notify_store_owner_for_receiving_order');
+		$this->loader->add_action('woocommerce_order_status_changed', $plugin_admin, 'check_for_ready_to_pickup', 10, 4);
 
 	}
 

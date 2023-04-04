@@ -348,4 +348,65 @@ class Woo_Pickup_Admin
 			}
 		}
 	}
+
+
+	// Send email to customer when order status is changed to "Ready To Pickup"
+
+	function check_for_ready_to_pickup($order_id, $old_status, $new_status, $order)
+	{
+
+		if ($new_status == 'ready-to-pickup' && $old_status != 'ready-to-pickup') {
+			$this->ready_to_pickup_notification($order_id);
+		} else {
+			//You can add multiple email on different actions of order status
+		}
+	}
+
+	function ready_to_pickup_notification($order_id)
+	{
+		$order = wc_get_order($order_id);
+
+		$customer_id = $order->get_customer_id();
+
+		if ($customer_id) {
+			$customer = new WC_Customer($customer_id);
+			$customer_email = $customer->get_email();
+			$customer_first_name = $customer->get_first_name();
+		} else {
+			$customer_email = $order->get_billing_email();
+			$customer_first_name = $order->get_billing_first_name();
+		}
+
+
+		$pickup_store = $order->get_meta('_pickup_store');
+		$pickup_date = $order->get_meta('_pickup_date');
+
+		if ($pickup_store && $pickup_store != '') {
+			$store = get_post($pickup_store);
+			$store_owner_email = get_post_meta($pickup_store, '_store_email', true);
+			if ($store_owner_email && $store_owner_email != '') {
+				$subject = sprintf(__('Knock Knock! Your order #%s is Ready to Pickup', 'woo-pickup'), $order->get_order_number());
+				$message = '';
+				$message .= 'Hey, ' . $customer_first_name . "\n";
+				$message .= 'Your order ' . $order->get_order_number() . ' is Ready to Pickup at Store ' . $store->post_title . "\n";
+				$message .= 'Order Details-> ' . "\n";
+				$message .= 'Pickup Date: ' . $pickup_date . "\n";
+				$message .= 'Customer Name: ' . $customer_first_name . "\n";
+				$message .= 'Customer Email: ' . $customer_email . "\n\n";
+
+				$message .= 'Pickup Store Details->' . "\n";
+				$message .= 'Store Name: ' . $store->post_title . "\n";
+				$message .= 'Address: ' . esc_html(get_post_meta($pickup_store, '_store_address', true)) . "\n";
+				$message .= 'Contact: ' . esc_html(get_post_meta($pickup_store, '_store_phone', true)) . "\n";
+				$message .= 'Email: ' . esc_html(get_post_meta($pickup_store, '_store_email', true)) . "\n";
+				$message .= 'Location: ' . esc_html(get_post_meta($pickup_store, '_store_location_url', true)) . "\n\n";
+				$message .= 'Please Make sure you carry Identity proof at time of pickup!';
+
+				$headers = array(
+					'From: ' . $store_owner_email
+				);
+				wp_mail($customer_email, $subject, $message, $headers);
+			}
+		}
+	}
 }
