@@ -133,4 +133,39 @@ class Woo_Pickup_Admin
 		);
 		register_post_type('store', $args);
 	}
+
+	// Add store details meta box to store post type
+	function add_store_details_meta_box()
+	{
+		add_meta_box(
+			'store_details_meta_box',
+			__('Store Details', 'woo-pickup'),
+			array($this, 'render_store_details_meta_box'),
+			'store',
+			'normal',
+			'default'
+		);
+	}
+
+
+	// Render store details meta box
+	function render_store_details_meta_box($post)
+	{
+		wp_nonce_field('save_store_details', 'store_details_nonce');
+		$store_name = get_post_meta($post->ID, '_store_name', true);
+		$store_address = get_post_meta($post->ID, '_store_address', true);
+		$store_phone = get_post_meta($post->ID, '_store_phone', true);
+		$store_email = get_post_meta($post->ID, '_store_email', true);
+		$store_location_url = get_post_meta($post->ID, '_store_location_url', true);
+		echo '<p><label for="store_name">' . __('Store Name', 'woo-pickup') . '</label><br>';
+		echo '<input type="text" id="store_name" name="store_name" value="' . esc_attr($store_name) . '"></p>';
+		echo '<p><label for="store_address">' . __('Store Address', 'woo-pickup') . '</label><br>';
+		echo '<textarea id="store_address" name="store_address">' . esc_textarea($store_address) . '</textarea></p>';
+		echo '<p><label for="store_phone">' . __('Store Phone', 'woo-pickup') . '</label><br>';
+		echo '<input type="text" id="store_phone" name="store_phone" value="' . esc_attr($store_phone) . '"></p>';
+		echo '<p><label for="store_email">' . __('Store Email', 'woo-pickup') . '</label><br>';
+		echo '<input type="text" id="store_email" name="store_email" value="' . esc_attr($store_email) . '"></p>';
+		echo '<p><label for="store_location_url">' . __('Store Location URL', 'woo-pickup') . '</label><br>';
+		echo '<input type="text" id="store_location_url" name="store_location_url" value="' . esc_attr($store_location_url) . '"></p>';
+	}
 }
