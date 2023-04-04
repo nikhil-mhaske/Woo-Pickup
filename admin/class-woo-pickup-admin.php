@@ -192,4 +192,48 @@ class Woo_Pickup_Admin
 			update_post_meta($post_id, '_store_location_url', esc_url_raw($_POST['store_location_url']));
 		}
 	}
+
+
+
+	// Add pickup store dropdown and date picker to checkout page
+	function add_pickup_store_to_checkout($checkout)
+	{
+		$pickup_stores = get_posts(array(
+			'post_type' => 'store',
+			'posts_per_page' => -1,
+			'orderby' => 'title',
+			'order' => 'ASC'
+		));
+		if ($pickup_stores) {
+			echo '<div id="pickup_store">';
+			woocommerce_form_field('pickup_store', array(
+				'type' => 'select',
+				'label' => __('Pickup Store', 'woo-pickup'),
+				'required' => true,
+				'options' => array(
+					'' => __('Select Pickup Store', 'woo-pickup')
+				) + wp_list_pluck($pickup_stores, 'post_title', 'ID')
+			), $checkout->get_value('pickup_store'));
+			echo '</div>';
+			echo '<div id="pickup_date">';
+			woocommerce_form_field('pickup_date', array(
+				'type' => 'date',
+				'label' => __('Pickup Date', 'woo-pickup'),
+				'required' => true,
+				'autocomplete' => 'off'
+			), $checkout->get_value('pickup_date'));
+			echo '</div>';
+		}
+	}
+
+	// Validate pickup store and date fields
+	function validate_pickup_store_and_date_fields()
+	{
+		if (!$_POST['pickup_store'] || $_POST['pickup_store'] == '') {
+			wc_add_notice(__('Please select a pickup store.', 'woo-pickup'), 'error');
+		}
+		if (!$_POST['pickup_date'] || $_POST['pickup_date'] == '') {
+			wc_add_notice(__('Please select a pickup date.', 'woo-pickup'), 'error');
+		}
+	}
 }

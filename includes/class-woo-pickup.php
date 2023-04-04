@@ -159,6 +159,12 @@ class Woo_Pickup {
 		$this->loader->add_action( 'init', $plugin_admin, 'register_store_post_type');
 		$this->loader->add_action( 'add_meta_boxes_store', $plugin_admin, 'add_store_details_meta_box');
 		$this->loader->add_action('save_post_store', $plugin_admin, 'save_store_details_meta_box_data');
+
+
+		$this->loader->add_action('woocommerce_after_order_notes', $plugin_admin, 'add_pickup_store_to_checkout');
+		$this->loader->add_action('woocommerce_checkout_process', $plugin_admin, 'validate_pickup_store_and_date_fields');
+
+
 	}
 
 	/**
