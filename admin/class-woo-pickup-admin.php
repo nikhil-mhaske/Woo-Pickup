@@ -20,7 +20,8 @@
  * @subpackage Woo_Pickup/admin
  * @author     Nikhil <nikhil.mhaske@wisdmlabs.com>
  */
-class Woo_Pickup_Admin {
+class Woo_Pickup_Admin
+{
 
 	/**
 	 * The ID of this plugin.
@@ -47,11 +48,11 @@ class Woo_Pickup_Admin {
 	 * @param      string    $plugin_name       The name of this plugin.
 	 * @param      string    $version    The version of this plugin.
 	 */
-	public function __construct( $plugin_name, $version ) {
+	public function __construct($plugin_name, $version)
+	{
 
 		$this->plugin_name = $plugin_name;
 		$this->version = $version;
-
 	}
 
 	/**
@@ -59,7 +60,8 @@ class Woo_Pickup_Admin {
 	 *
 	 * @since    1.0.0
 	 */
-	public function enqueue_styles() {
+	public function enqueue_styles()
+	{
 
 		/**
 		 * This function is provided for demonstration purposes only.
@@ -73,8 +75,7 @@ class Woo_Pickup_Admin {
 		 * class.
 		 */
 
-		wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/woo-pickup-admin.css', array(), $this->version, 'all' );
-
+		wp_enqueue_style($this->plugin_name, plugin_dir_url(__FILE__) . 'css/woo-pickup-admin.css', array(), $this->version, 'all');
 	}
 
 	/**
@@ -82,7 +83,8 @@ class Woo_Pickup_Admin {
 	 *
 	 * @since    1.0.0
 	 */
-	public function enqueue_scripts() {
+	public function enqueue_scripts()
+	{
 
 		/**
 		 * This function is provided for demonstration purposes only.
@@ -96,25 +98,39 @@ class Woo_Pickup_Admin {
 		 * class.
 		 */
 
-		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/woo-pickup-admin.js', array( 'jquery' ), $this->version, false );
-
+		wp_enqueue_script($this->plugin_name, plugin_dir_url(__FILE__) . 'js/woo-pickup-admin.js', array('jquery'), $this->version, false);
 	}
 
-	//Add submenu in woocommerce
-	function my_custom_submenu() {
-		add_submenu_page(
-			'woocommerce',
-			'Pickup Stores',
-			'Pickup Stores',
-			'manage_options',
-			'pickup-stores',
-			array($this, 'pickup_stores_callback')
+
+	// Add custom post type for store locations
+	function register_store_post_type()
+	{
+		$labels = array(
+			'name' => __('Pickup Stores'),
+			'singular_name' => __('Store'),
+			'menu_name' => __('Woo Pickup'),
+			'add_new' => __('Add New'),
+			'add_new_item' => __('Add New Store'),
+			'edit' => __('Edit'),
+			'edit_item' => __('Edit Store'),
+			'new_item' => __('New Store'),
+			'view' => __('View Store'),
+			'view_item' => __('View Store'),
+			'search_items' => __('Search Stores'),
+			'not_found' => __('No stores found'),
+			'not_found_in_trash' => __('No stores found in trash'),
 		);
+		$args = array(
+			'labels' => $labels,
+			'public' => false,
+			'menu_position' => 5,
+			'menu_icon' => 'dashicons-store',
+			'supports' => array('title'),
+			'show_ui' => true,
+			'show_in_menu' => true,
+			'query_var' => true,
+			'rewrite' => array('slug' => 'store'),
+		);
+		register_post_type('store', $args);
 	}
-	
-	function pickup_stores_callback() {
-		// The code for your custom submenu page goes here
-		echo "Hiii!";
-	}
-	
 }

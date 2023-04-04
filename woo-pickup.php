@@ -16,12 +16,12 @@
  * Plugin Name:       Woo Pickup
  * Plugin URI:        https://nikhil.wisdmlabs.net
  * Description:       Enhancing the Local pickup facility in WooCommerce.
-Features:
-1. Local Pickup option
-2. Select from multiple stores
-3. Select Pickup Date
-4. Email on Order Confirmation
-5. Reminder Email before one day of Pickup Date
+ * Features:
+ * 1. Local Pickup option
+ * 2. Select from multiple stores
+ * 3. Select Pickup Date
+ * 4. Email on Order Confirmation
+ * 5. Reminder Email before one day of Pickup Date
  * Version:           1.0.0
  * Author:            Nikhil
  * Author URI:        https://nikhil.wisdmlabs.net
@@ -32,7 +32,7 @@ Features:
  */
 
 // If this file is called directly, abort.
-if ( ! defined( 'WPINC' ) ) {
+if (!defined('WPINC')) {
 	die;
 }
 
@@ -41,14 +41,15 @@ if ( ! defined( 'WPINC' ) ) {
  * Start at version 1.0.0 and use SemVer - https://semver.org
  * Rename this for your plugin and update it as you release new versions.
  */
-define( 'WOO_PICKUP_VERSION', '1.0.0' );
+define('WOO_PICKUP_VERSION', '1.0.0');
 
 /**
  * The code that runs during plugin activation.
  * This action is documented in includes/class-woo-pickup-activator.php
  */
-function activate_woo_pickup() {
-	require_once plugin_dir_path( __FILE__ ) . 'includes/class-woo-pickup-activator.php';
+function activate_woo_pickup()
+{
+	require_once plugin_dir_path(__FILE__) . 'includes/class-woo-pickup-activator.php';
 	Woo_Pickup_Activator::activate();
 }
 
@@ -56,19 +57,20 @@ function activate_woo_pickup() {
  * The code that runs during plugin deactivation.
  * This action is documented in includes/class-woo-pickup-deactivator.php
  */
-function deactivate_woo_pickup() {
-	require_once plugin_dir_path( __FILE__ ) . 'includes/class-woo-pickup-deactivator.php';
+function deactivate_woo_pickup()
+{
+	require_once plugin_dir_path(__FILE__) . 'includes/class-woo-pickup-deactivator.php';
 	Woo_Pickup_Deactivator::deactivate();
 }
 
-register_activation_hook( __FILE__, 'activate_woo_pickup' );
-register_deactivation_hook( __FILE__, 'deactivate_woo_pickup' );
+register_activation_hook(__FILE__, 'activate_woo_pickup');
+register_deactivation_hook(__FILE__, 'deactivate_woo_pickup');
 
 /**
  * The core plugin class that is used to define internationalization,
  * admin-specific hooks, and public-facing site hooks.
  */
-require plugin_dir_path( __FILE__ ) . 'includes/class-woo-pickup.php';
+require plugin_dir_path(__FILE__) . 'includes/class-woo-pickup.php';
 
 /**
  * Begins execution of the plugin.
@@ -79,10 +81,10 @@ require plugin_dir_path( __FILE__ ) . 'includes/class-woo-pickup.php';
  *
  * @since    1.0.0
  */
-function run_woo_pickup() {
+function run_woo_pickup()
+{
 
 	$plugin = new Woo_Pickup();
 	$plugin->run();
-
 }
 run_woo_pickup();
