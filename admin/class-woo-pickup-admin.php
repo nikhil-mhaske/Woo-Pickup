@@ -247,4 +247,13 @@ class Woo_Pickup_Admin
 			$order->update_meta_data('_pickup_date', sanitize_text_field($_POST['pickup_date']));
 		}
 	}
+
+
+
+	// Add "Ready to Pickup" order status
+	function add_ready_to_pickup_order_status($order_statuses)
+	{
+		$order_statuses['wc-ready-to-pickup'] = __('Ready to Pickup', 'woo-pickup');
+		return $order_statuses;
+	}
 }

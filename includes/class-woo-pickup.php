@@ -27,7 +27,8 @@
  * @subpackage Woo_Pickup/includes
  * @author     Nikhil <nikhil.mhaske@wisdmlabs.com>
  */
-class Woo_Pickup {
+class Woo_Pickup
+{
 
 	/**
 	 * The loader that's responsible for maintaining and registering all hooks that power
@@ -66,8 +67,9 @@ class Woo_Pickup {
 	 *
 	 * @since    1.0.0
 	 */
-	public function __construct() {
-		if ( defined( 'WOO_PICKUP_VERSION' ) ) {
+	public function __construct()
+	{
+		if (defined('WOO_PICKUP_VERSION')) {
 			$this->version = WOO_PICKUP_VERSION;
 		} else {
 			$this->version = '1.0.0';
@@ -78,7 +80,6 @@ class Woo_Pickup {
 		$this->set_locale();
 		$this->define_admin_hooks();
 		$this->define_public_hooks();
-
 	}
 
 	/**
@@ -97,33 +98,33 @@ class Woo_Pickup {
 	 * @since    1.0.0
 	 * @access   private
 	 */
-	private function load_dependencies() {
+	private function load_dependencies()
+	{
 
 		/**
 		 * The class responsible for orchestrating the actions and filters of the
 		 * core plugin.
 		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-woo-pickup-loader.php';
+		require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-woo-pickup-loader.php';
 
 		/**
 		 * The class responsible for defining internationalization functionality
 		 * of the plugin.
 		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-woo-pickup-i18n.php';
+		require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-woo-pickup-i18n.php';
 
 		/**
 		 * The class responsible for defining all actions that occur in the admin area.
 		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-woo-pickup-admin.php';
+		require_once plugin_dir_path(dirname(__FILE__)) . 'admin/class-woo-pickup-admin.php';
 
 		/**
 		 * The class responsible for defining all actions that occur in the public-facing
 		 * side of the site.
 		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'public/class-woo-pickup-public.php';
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/class-woo-pickup-public.php';
 
 		$this->loader = new Woo_Pickup_Loader();
-
 	}
 
 	/**
@@ -135,12 +136,12 @@ class Woo_Pickup {
 	 * @since    1.0.0
 	 * @access   private
 	 */
-	private function set_locale() {
+	private function set_locale()
+	{
 
 		$plugin_i18n = new Woo_Pickup_i18n();
 
-		$this->loader->add_action( 'plugins_loaded', $plugin_i18n, 'load_plugin_textdomain' );
-
+		$this->loader->add_action('plugins_loaded', $plugin_i18n, 'load_plugin_textdomain');
 	}
 
 	/**
@@ -150,21 +151,22 @@ class Woo_Pickup {
 	 * @since    1.0.0
 	 * @access   private
 	 */
-	private function define_admin_hooks() {
+	private function define_admin_hooks()
+	{
 
-		$plugin_admin = new Woo_Pickup_Admin( $this->get_plugin_name(), $this->get_version() );
+		$plugin_admin = new Woo_Pickup_Admin($this->get_plugin_name(), $this->get_version());
 
-		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_styles' );
-		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts' );
-		$this->loader->add_action( 'init', $plugin_admin, 'register_store_post_type');
-		$this->loader->add_action( 'add_meta_boxes_store', $plugin_admin, 'add_store_details_meta_box');
+		$this->loader->add_action('admin_enqueue_scripts', $plugin_admin, 'enqueue_styles');
+		$this->loader->add_action('admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts');
+		$this->loader->add_action('init', $plugin_admin, 'register_store_post_type');
+		$this->loader->add_action('add_meta_boxes_store', $plugin_admin, 'add_store_details_meta_box');
 		$this->loader->add_action('save_post_store', $plugin_admin, 'save_store_details_meta_box_data');
 
 
 		$this->loader->add_action('woocommerce_after_order_notes', $plugin_admin, 'add_pickup_store_to_checkout');
 		$this->loader->add_action('woocommerce_checkout_process', $plugin_admin, 'validate_pickup_store_and_date_fields');
 		$this->loader->add_action('woocommerce_checkout_create_order', $plugin_admin, 'save_to_order_meta_data');
-
+		$this->loader->add_filter('wc_order_statuses', $plugin_admin, 'add_ready_to_pickup_order_status');
 	}
 
 	/**
@@ -174,13 +176,13 @@ class Woo_Pickup {
 	 * @since    1.0.0
 	 * @access   private
 	 */
-	private function define_public_hooks() {
+	private function define_public_hooks()
+	{
 
-		$plugin_public = new Woo_Pickup_Public( $this->get_plugin_name(), $this->get_version() );
+		$plugin_public = new Woo_Pickup_Public($this->get_plugin_name(), $this->get_version());
 
-		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_styles' );
-		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_scripts' );
-
+		$this->loader->add_action('wp_enqueue_scripts', $plugin_public, 'enqueue_styles');
+		$this->loader->add_action('wp_enqueue_scripts', $plugin_public, 'enqueue_scripts');
 	}
 
 	/**
@@ -188,7 +190,8 @@ class Woo_Pickup {
 	 *
 	 * @since    1.0.0
 	 */
-	public function run() {
+	public function run()
+	{
 		$this->loader->run();
 	}
 
@@ -199,7 +202,8 @@ class Woo_Pickup {
 	 * @since     1.0.0
 	 * @return    string    The name of the plugin.
 	 */
-	public function get_plugin_name() {
+	public function get_plugin_name()
+	{
 		return $this->plugin_name;
 	}
 
@@ -209,7 +213,8 @@ class Woo_Pickup {
 	 * @since     1.0.0
 	 * @return    Woo_Pickup_Loader    Orchestrates the hooks of the plugin.
 	 */
-	public function get_loader() {
+	public function get_loader()
+	{
 		return $this->loader;
 	}
 
@@ -219,8 +224,8 @@ class Woo_Pickup {
 	 * @since     1.0.0
 	 * @return    string    The version number of the plugin.
 	 */
-	public function get_version() {
+	public function get_version()
+	{
 		return $this->version;
 	}
-
 }
