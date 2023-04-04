@@ -167,6 +167,8 @@ class Woo_Pickup
 		$this->loader->add_action('woocommerce_checkout_process', $plugin_admin, 'validate_pickup_store_and_date_fields');
 		$this->loader->add_action('woocommerce_checkout_create_order', $plugin_admin, 'save_to_order_meta_data');
 		$this->loader->add_filter('wc_order_statuses', $plugin_admin, 'add_ready_to_pickup_order_status');
+		$this->loader->add_action('woocommerce_admin_order_data_after_shipping_address', $plugin_admin, 'order_admin_page_modifications');
+
 	}
 
 	/**

@@ -256,4 +256,26 @@ class Woo_Pickup_Admin
 		$order_statuses['wc-ready-to-pickup'] = __('Ready to Pickup', 'woo-pickup');
 		return $order_statuses;
 	}
+
+	// Add pickup store details to order admin page
+	function order_admin_page_modifications($order)
+	{
+		$pickup_store = $order->get_meta('_pickup_store');
+		$pickup_date = $order->get_meta('_pickup_date');
+		if ($pickup_store && $pickup_store != '') {
+
+			echo '<div class="pickup-store-details">';
+			echo '<h2>' . __('Pickup Store Details', 'woo-pickup') . '</h2>';
+			$store = get_post($pickup_store);
+			echo '<p><strong>' . __('Store Name', 'woo-pickup') . ':</strong> ' . esc_html($store->post_title) . '</p>';
+			echo '<p><strong>' . __('Address', 'woo-pickup') . ':</strong> ' . esc_html(get_post_meta($pickup_store, '_store_address', true)) . '</p>';
+			echo '<p><strong>' . __('Phone', 'woo-pickup') . ':</strong> ' . esc_html(get_post_meta($pickup_store, '_store_phone', true)) . '</p>';
+			echo '<p><strong>' . __('Email', 'woo-pickup') . ':</strong> ' . esc_html(get_post_meta($pickup_store, '_store_email', true)) . '</p>';
+			echo '<p><strong>' . __('Location URL', 'woo-pickup') . ':</strong> ' . esc_url(get_post_meta($pickup_store, '_store_location_url', true)) . '</p>';
+			if ($pickup_date && $pickup_date != '') {
+				echo '<p><strong>' . __('Pickup Date', 'woo-pickup') . ':</strong> ' . esc_html($pickup_date) . '</p>';
+			}
+			echo '</div>';
+		}
+	}
 }
