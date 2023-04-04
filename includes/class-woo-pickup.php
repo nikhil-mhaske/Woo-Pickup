@@ -163,7 +163,7 @@ class Woo_Pickup {
 
 		$this->loader->add_action('woocommerce_after_order_notes', $plugin_admin, 'add_pickup_store_to_checkout');
 		$this->loader->add_action('woocommerce_checkout_process', $plugin_admin, 'validate_pickup_store_and_date_fields');
-
+		$this->loader->add_action('woocommerce_checkout_create_order', $plugin_admin, 'save_to_order_meta_data');
 
 	}
 

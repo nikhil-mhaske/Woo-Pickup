@@ -236,4 +236,15 @@ class Woo_Pickup_Admin
 			wc_add_notice(__('Please select a pickup date.', 'woo-pickup'), 'error');
 		}
 	}
+
+	// Save pickup store and date fields to order meta data
+	function save_to_order_meta_data($order)
+	{
+		if ($_POST['pickup_store'] && $_POST['pickup_store'] != '') {
+			$order->update_meta_data('_pickup_store', sanitize_text_field($_POST['pickup_store']));
+		}
+		if ($_POST['pickup_date'] && $_POST['pickup_date'] != '') {
+			$order->update_meta_data('_pickup_date', sanitize_text_field($_POST['pickup_date']));
+		}
+	}
 }
