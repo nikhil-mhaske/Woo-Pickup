@@ -168,4 +168,28 @@ class Woo_Pickup_Admin
 		echo '<p><label for="store_location_url">' . __('Store Location URL', 'woo-pickup') . '</label><br>';
 		echo '<input type="text" id="store_location_url" name="store_location_url" value="' . esc_attr($store_location_url) . '"></p>';
 	}
+
+
+	// Save store details meta box data
+	function save_store_details_meta_box_data($post_id)
+	{
+		if (!isset($_POST['store_details_nonce']) || !wp_verify_nonce($_POST['store_details_nonce'], 'save_store_details')) {
+			return;
+		}
+		if (isset($_POST['store_name'])) {
+			update_post_meta($post_id, '_store_name', sanitize_text_field($_POST['store_name']));
+		}
+		if (isset($_POST['store_address'])) {
+			update_post_meta($post_id, '_store_address', sanitize_textarea_field($_POST['store_address']));
+		}
+		if (isset($_POST['store_phone'])) {
+			update_post_meta($post_id, '_store_phone', sanitize_text_field($_POST['store_phone']));
+		}
+		if (isset($_POST['store_email'])) {
+			update_post_meta($post_id, '_store_email', sanitize_email($_POST['store_email']));
+		}
+		if (isset($_POST['store_location_url'])) {
+			update_post_meta($post_id, '_store_location_url', esc_url_raw($_POST['store_location_url']));
+		}
+	}
 }
