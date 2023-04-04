@@ -278,4 +278,74 @@ class Woo_Pickup_Admin
 			echo '</div>';
 		}
 	}
+
+	// Add pickup store details to order confirmation email
+	function add_store_details_to_confirmation_mail($order, $sent_to_admin, $plain_text, $email)
+	{
+		$pickup_store = $order->get_meta('_pickup_store');
+		$pickup_date = $order->get_meta('_pickup_date');
+		if ($pickup_store && $pickup_store != '') {
+			$store = get_post($pickup_store);
+			echo '<h2>' . __('Pickup Store', 'woo-pickup') . '</h2>';
+			echo '<div>';
+			echo '<p><strong>' . __('Store Name', 'woo-pickup') . ':</strong> ' . esc_html($store->post_title) . '</p>';
+			echo '<p><strong>' . __('Address', 'woo-pickup') . ':</strong> ' . esc_html(get_post_meta($pickup_store, '_store_address', true)) . '</p>';
+			echo '<p><strong>' . __('Phone', 'woo-pickup') . ':</strong> ' . esc_html(get_post_meta($pickup_store, '_store_phone', true)) . '</p>';
+			echo '<p><strong>' . __('Email', 'woo-pickup') . ':</strong> ' . esc_html(get_post_meta($pickup_store, '_store_email', true)) . '</p>';
+			echo '<p><strong>' . __('Location URL', 'woo-pickup') . ':</strong> ' . esc_url(get_post_meta($pickup_store, '_store_location_url', true)) . '</p>';
+		}
+		if ($pickup_date && $pickup_date != '') {
+			echo '<h2>' . __('Pickup Date', 'woo-pickup') . '</h2>';
+			echo '<p>' . esc_html($pickup_date) . '</p>';
+		}
+	}
+
+	// Notify store owner when order is received
+	function notify_store_owner_for_receiving_order($order_id)
+	{
+
+		$order = wc_get_order($order_id);
+		global $admin_email;
+		$admin_email = get_option('admin_email');
+		$customer_id = $order->get_customer_id();
+
+		if ($customer_id) {
+			$customer = new WC_Customer($customer_id);
+
+			$customer_email = $customer->get_email();
+			$customer_first_name = $customer->get_first_name();
+			$customer_last_name = $customer->get_last_name();
+			$customer_phone = $customer->get_billing_phone();
+		} else {
+			$customer_email = $order->get_billing_email();
+			$customer_first_name = $order->get_billing_first_name();
+			$customer_last_name = $order->get_billing_last_name();
+			$customer_phone = $order->get_billing_phone();
+		}
+
+
+		$pickup_store = $order->get_meta('_pickup_store');
+		$pickup_date = $order->get_meta('_pickup_date');
+
+		if ($pickup_store && $pickup_store != '') {
+			$store = get_post($pickup_store);
+			$store_owner_email = get_post_meta($pickup_store, '_store_email', true);
+			if ($store_owner_email && $store_owner_email != '') {
+				$subject = sprintf(__('You Received Pickup Store order #%s', 'woo-pickup'), $order->get_order_number());
+				$message = '';
+				$message .= 'Hey, ' . $store->post_title . "\n";
+				$message .= 'Your store received a Pickup Order ' . $order->get_order_number() . "\n";
+				$message .= 'Order Details: ' . "\n";
+				$message .= 'Pickup Date: ' . $pickup_date . "\n";
+				$message .= 'Customer Name: ' . $customer_first_name . ' ' . $customer_last_name . "\n";
+				$message .= 'Customer Email: ' . $customer_email . "\n";
+				$message .= 'Customer Phone No: ' . $customer_phone . "\n\n";
+				$message .= 'Customer will be notified when order status changed to Ready To Pickup!';
+				$headers = array(
+					'From: ' . $admin_email
+				);
+				wp_mail($store_owner_email, $subject, $message, $headers);
+			}
+		}
+	}
 }

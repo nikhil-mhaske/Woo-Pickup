@@ -168,6 +168,8 @@ class Woo_Pickup
 		$this->loader->add_action('woocommerce_checkout_create_order', $plugin_admin, 'save_to_order_meta_data');
 		$this->loader->add_filter('wc_order_statuses', $plugin_admin, 'add_ready_to_pickup_order_status');
 		$this->loader->add_action('woocommerce_admin_order_data_after_shipping_address', $plugin_admin, 'order_admin_page_modifications');
+		$this->loader->add_action('woocommerce_email_order_details', $plugin_admin, 'add_store_details_to_confirmation_mail', 10, 4);
+		$this->loader->add_action('woocommerce_email_order_details', $plugin_admin, 'notify_store_owner_for_receiving_order');
 
 	}
 
