@@ -257,6 +257,18 @@ class Woo_Pickup_Admin
 		return $order_statuses;
 	}
 
+	// Update order status in database when "Ready to Pickup" is selected
+	function update_order_status_in_database($order_id, $old_status, $new_status, $order)
+	{
+		if ($new_status == 'ready-to-pickup' && $old_status != 'ready-to-pickup') {
+			global $wpdb;
+			$table_name = $wpdb->prefix . 'posts';
+			$wpdb->update($table_name, array('post_status' => 'wc-ready-to-pickup'), array('ID' => $order_id));
+		}
+		return $new_status;
+	}
+
+	
 	// Add pickup store details to order admin page
 	function order_admin_page_modifications($order)
 	{
