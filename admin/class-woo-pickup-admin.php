@@ -248,7 +248,17 @@ class Woo_Pickup_Admin
 		}
 	}
 
-
+	function register_ready_to_pickup_status()
+	{
+		register_post_status('wc-ready-to-pickup', array(
+			'label'                     => _x('Ready To Pickup', 'Order status', 'woo-pickup'),
+			'public'                    => true,
+			'exclude_from_search'       => false,
+			'show_in_admin_all_list'    => true,
+			'show_in_admin_status_list' => true,
+			'label_count'               => _n_noop('Ready To Pickup <span class="count">(%s)</span>', 'Ready To Pickup<span class="count">(%s)</span>', 'woo-pickup')
+		));
+	}
 
 	// Add "Ready to Pickup" order status
 	function add_ready_to_pickup_order_status($order_statuses)
@@ -268,7 +278,7 @@ class Woo_Pickup_Admin
 		return $new_status;
 	}
 
-	
+
 	// Add pickup store details to order admin page
 	function order_admin_page_modifications($order)
 	{
@@ -418,6 +428,66 @@ class Woo_Pickup_Admin
 
 				wp_mail($customer_email, $subject, $message, $headers);
 			}
+		}
+	}
+
+	//Schedule Reminder mail for one day before pickup
+	function send_pickup_reminder_email($order_id)
+	{
+		// Retrieve the pickup date from the order
+		$order = wc_get_order($order_id);
+		$pickup_date = $order->get_meta('_pickup_date');
+
+		$datetime_object = new DateTime($pickup_date, new DateTimeZone('Asia/Kolkata'));
+		$timestamp = $datetime_object->getTimestamp(); //2023-04-08 12:00:00
+		$formatted_timestamp = $timestamp - 86400; //2023-04-07 12:00:00
+
+		wp_schedule_single_event($formatted_timestamp, 'send_pickup_reminder_email_cron', array($order_id));
+	}
+
+	function send_pickup_reminder_email_callback($order_id)
+	{
+		// Retrieve the customer email address
+		$order = wc_get_order($order_id);
+		$pickup_store = $order->get_meta('_pickup_store');
+		$pickup_date = $order->get_meta('_pickup_date');
+
+		$customer_id = $order->get_customer_id();
+
+		if ($customer_id) {
+			$customer = new WC_Customer($customer_id);
+			$customer_email = $customer->get_email();
+			$customer_first_name = $customer->get_first_name();
+		} else {
+			$customer_email = $order->get_billing_email();
+			$customer_first_name = $order->get_billing_first_name();
+		}
+
+		$store = get_post($pickup_store);
+		$store_owner_email = get_post_meta($pickup_store, '_store_email', true);
+
+		// Create and send the email reminder
+		if ($store_owner_email && $store_owner_email != '') {
+			$subject = sprintf(__('Hey Reminder to Pickup Your order #%s', 'woo-pickup'), $order->get_order_number());
+			$message = '';
+			$message .= 'Hey, ' . $customer_first_name . "\n";
+			$message .= 'Tomorrow, Your order ' . $order->get_order_number() . ' will be Ready to Pickup at Store ' . $store->post_title . "\n\n";
+			$message .= 'Order Details-> ' . "\n";
+			$message .= 'Pickup Date: ' . $pickup_date . "\n";
+			$message .= 'Customer Name: ' . $customer_first_name . "\n";
+			$message .= 'Customer Email: ' . $customer_email . "\n\n";
+
+			$message .= 'Pickup Store Details->' . "\n";
+			$message .= 'Store Name: ' . $store->post_title . "\n";
+			$message .= 'Address: ' . esc_html(get_post_meta($pickup_store, '_store_address', true)) . "\n";
+			$message .= 'Contact: ' . esc_html(get_post_meta($pickup_store, '_store_phone', true)) . "\n";
+			$message .= 'Email: ' . esc_html(get_post_meta($pickup_store, '_store_email', true)) . "\n";
+			$message .= 'Location: ' . esc_html(get_post_meta($pickup_store, '_store_location_url', true)) . "\n\n";
+			$message .= 'Please Make sure you carry Identity proof at time of pickup!';
+
+			$headers = "From: {$store_owner_email}";
+
+			wp_mail($customer_email, $subject, $message, $headers);
 		}
 	}
 }
