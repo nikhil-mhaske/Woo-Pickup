@@ -198,6 +198,7 @@ class Woo_Pickup_Admin
 	// Add pickup store dropdown and date picker to checkout page
 	function add_pickup_store_to_checkout($checkout)
 	{
+		$min_date= date('Y-m-d'); //Get Current Date
 		$pickup_stores = get_posts(array(
 			'post_type' => 'store',
 			'posts_per_page' => -1,
@@ -220,7 +221,10 @@ class Woo_Pickup_Admin
 				'type' => 'date',
 				'label' => __('Pickup Date', 'woo-pickup'),
 				'required' => true,
-				'autocomplete' => 'off'
+				'autocomplete' => 'off',
+				'custom_attributes' => array(
+					'min' => $min_date // set the minimum date
+				)
 			), $checkout->get_value('pickup_date'));
 			echo '</div>';
 		}
